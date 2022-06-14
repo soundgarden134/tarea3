@@ -22,10 +22,19 @@ def get_features(x, par_prep):
     L = par_prep[1]
     segments = np.split(x,numSegments)
     J = par_prep[2]
+    
     for idx, segment in enumerate(segments):
-        H = get_hankel_matrix(segment, 2,L-1)
-        svd_x = hankel_svd(H)
-        comps = calculate_features(svd_x, J)
+        j_comps = np.split(segment, J)
+        new_x = []
+        for comp in j_comps:
+            length = len(comp)
+            H = get_hankel_matrix(comp, 2,length-1)
+            svd_x = hankel_svd(H)
+            entropy = entropy_spectral(svd_x)
+            new_x.append(entropy)
+        seg_entropy = entropy_spectral(segment)
+        new_x.append(seg_entropy)
+                
  
 
 
@@ -46,20 +55,6 @@ def get_hankel_matrix(x,rows,cols):
 
             
 
-def calculate_features(x,J):
-
-    j_comps = np.split(x,J) #supongo que se divide en j componentes despues de esto??
-
-
-    entropies = np.zeros(J+1)
-    for idx,component in enumerate(j_comps):
-        entropies[idx] = entropy_spectral(component) #entropia de componentes
-    entropies[J] = entropy_spectral(x)
-    
-
-
-    return entropies
-        
         
     
 def hankel_svd(H): #retorna el x de la suma de c1 y c2
@@ -103,7 +98,6 @@ def entropy_spectral(X):
     return H
 
 def get_a(x):
-    start = timer()
     A = np.zeros(len(x))
     
     for k in range(len(x)):
@@ -113,8 +107,7 @@ def get_a(x):
         Ak = norm(Ak)
         A[k] = Ak
         
-    end = timer()
-    print(end-start)
+
     return A
     
 

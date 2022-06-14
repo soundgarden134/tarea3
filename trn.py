@@ -23,13 +23,29 @@ def train(x,y,param):
 
 # Load data from xData.csv, yData,csv
 def load_data_trn():
-    ....
+    data = pd.read_csv("dtrain.csv",header=None)
+    xe = data.iloc[:-1, :]
+    xe = np.array(xe)
+    ye = data.iloc[-1, :]
+    ye = pd.get_dummies(ye) #one hot encoder
+    ye = np.array(ye)
+    ye = ye.T
+
+    return(xe,ye)
     return()
     
 # Load parameters for SNN'straining
 def load_cnf_snn():
-    ...
-    return()
+    par = np.genfromtxt("param_snn.csv",delimiter=',')    
+    par_snn = []   
+    par_snn.append(np.int16(par[0])) # trainingPerc
+    par_snn.append(np.int16(par[1])) # maxIter
+    par_snn.append(np.float(par[2])) # LearningRate
+    for i in range(3,len(par)):
+        par_snn.append(np.int16(par[i])) #nodos
+
+    return par_snn
+
    
 # Beginning ...
 def main():
