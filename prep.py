@@ -8,38 +8,63 @@ from math import pi
 
 def hankel_features(xe,ye, par_prep):
   M = xe.shape[0]  
+  numSegments = par_prep[0]
+  new_x = []
+  new_y = []
+  start = timer()
   for i in range(0,M):
-      print("Muestra numero "+str(i))
+      print("Muestra numero "+str(i+1))
       x=xe[i,:]
-      get_features(x, par_prep)
-   
-  return() 
+      new_samples,new_labels = get_features(x, par_prep, ye[i])
+      if i == 0:
+          new_x = new_samples
+          new_y = new_labels
+      else:
+          new_x = np.vstack([new_x, new_samples])
+          new_y = np.vstack([new_y, new_labels])
+  end = timer()
+  print("Elapsed time: " + str(round(end-start)) + " seconds.")
+  return new_x, new_y 
 
 # Hankel's features
-def get_features(x, par_prep):
+def get_features(x, par_prep, label):
     N = x.shape[0]
     numSegments = par_prep[0]
     L = par_prep[1]
     segments = np.split(x,numSegments)
     J = par_prep[2]
-    
+    new_features = []
+    new_labels = []
     for idx, segment in enumerate(segments):
         j_comps = np.split(segment, J)
         new_x = []
+        comp_matrix = []
         for comp in j_comps:
             length = len(comp)
             H = get_hankel_matrix(comp, 2,length-1)
             svd_x = hankel_svd(H)
+            comp_matrix = np.append(comp_matrix,svd_x)
             entropy = entropy_spectral(svd_x)
             new_x.append(entropy)
+        comp_matrix = np.reshape(comp_matrix, (len(comp)*2,J))
+        _,S,_ = svd(comp_matrix) #valores singulares
         seg_entropy = entropy_spectral(segment)
         new_x.append(seg_entropy)
-                
+        new_x = np.concatenate((new_x,S))
+        new_features = np.append(new_features, new_x)
+
+
+    end = timer()
+    new_features = np.split(new_features, numSegments)
+    for i in range(len(segments)):
+        new_labels = np.append(new_labels,label)
+    new_labels = np.reshape(new_labels, (len(segments),len(label)))
+        
  
 
 
     
-    return(...)
+    return new_features, new_labels
 
 
 def get_hankel_matrix(x,rows,cols):
@@ -60,7 +85,7 @@ def get_hankel_matrix(x,rows,cols):
 def hankel_svd(H): #retorna el x de la suma de c1 y c2
     U, S, V = svd(H, full_matrices = False)
     V = V.T
-
+    
     a = U[:,0].reshape(U.shape[0],1) 
     b = V[:,0].reshape(1,V.shape[0])
     h1 = S[0]*a@b
@@ -118,7 +143,7 @@ def p(A, k):
 
     
 # Binary Label
-def binary_label():
+def binary_label(): #uso get dummies
   ...
   return
 
