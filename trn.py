@@ -6,9 +6,10 @@ import my_utility as ut
 
 
 #Save weights of the SNN
-def save_w():
-    ...
-    return
+def save_w(W, Cost):
+    np.savetxt("costo_snn.csv", Cost, delimiter=",")
+    
+    np.savez("w_snn.npz", W)
 
 
     
@@ -20,12 +21,15 @@ def snn_train(x,y,param):
     learningRate = param[2]
     W,V = ut.iniWs(x.shape[1], param[3:],numClasses) #nodos de entrada y nodos ocultos, falta S
     Costo = []
-    for iter in range(MaxIter):        
+    for iter in range(MaxIter):     
         a       = ut.forward(x,W)
         gW,cost = ut.gradW(a,W,y)        
         W,V   = ut.updW(W,V,gW,learningRate)
         Costo.append(cost)
+        if (iter+1)%50 == 0 or iter == 0:
+            print("Costo iteracion " + str(iter+1) + ": " + "%.9f" % cost)
     return(W,Costo)
+
 
 # Load data from xData.csv, yData,csv
 def load_data_trn(trainingPerc):
@@ -74,11 +78,8 @@ def main():
     param       = load_cnf_snn()            
     xe,ye       = load_data_trn(param[0])   
     W,Cost      = snn_train(xe,ye,param)    
-    print(Cost[0])
-    print(Cost[200])
-    print(Cost[-1])      
-
-    # save_w(W,Cost)
+    
+    save_w(W,Cost)
        
 if __name__ == '__main__':   
 	 main()

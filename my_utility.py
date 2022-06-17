@@ -88,33 +88,69 @@ def gradW(a,w,y):
 
 # Update Ws RMSProp
 def updW(w,v,gW,mu):
-    # eps = 10**-10
-    # mu = 0.0001
-    # b = 0.9
-    # for i in range(len(w)):
-    #     v[i] = b*v[i] + (1-b)*gW[i]
-    #     gRMS = (mu/(v[i] + eps))*gW[i]
-    #     w[i] = w[i] - gRMS
-        
-    # return w,v
-    
-    # Parametros
-    mu = 0.0001
-    eps = 10**-9
+    eps = 10**-10
     b = 0.9
-
     for i in range(len(w)):
-        w[i] = v[i] + w[i]
-        v[i] = b*v[i] - mu*gW[i]
+        v[i] = b*v[i] + (1-b)*(gW[i])**2
+        gRMS_a = (mu/(np.sqrt(v[i] + eps)))
+        gRMS = gRMS_a*gW[i]
+        w[i] = w[i] - gRMS
+    return w,v
     
-    return(w,v)
+    
 
         
         
 # Measure
 def metricas(x,y):
-    ...    
-    return()
+    
+    x = x.T
+    confusion_matrix = np.zeros((y.shape[0], x.shape[0]))
+    
+    for real, predicted in zip(y.T, x.T):
+        confusion_matrix[np.argmax(real)][np.argmax(predicted)] += 1
+        
+    f_score = []
+    recall_array = []
+    precision_array = []
+    accuracy_array = []
+    
+    TPS = 0
+    FPS = 0
+    FNS = 0
+    TNS = 0
+    for index, caracteristica in enumerate(confusion_matrix):
+        
+        TP = caracteristica[index]
+        FP = confusion_matrix.sum(axis=0)[index] - TP
+        FN = confusion_matrix.sum(axis=1)[index] - TP
+        TN = confusion_matrix.sum(axis=0)[index] - FN
+        
+        TPS += TP
+        FPS += FP
+        FNS += FN
+        TNS += TN
+        recall = TP / (TP + FN)
+        precision = TP / (TP + FP)
+        recall_array.append(recall)
+        precision_array.append(precision)
+        f_score.append(2 * (precision * recall) / (precision + recall))
+    precision_array = np.array(precision_array)
+    recall_array = np.array(recall_array)
+    accuracy = (TPS+TNS)/(TPS+TNS+FPS+FNS)
+    print('Accuracy: {:.5f}'.format(accuracy))
+    print('Recall promedio: {:.5f}'.format(recall_array.mean()))
+    print('Precision promedio: {:.5f}'.format(recall_array.mean()))
+    avg_fscore = np.array(f_score).mean()
+    f_scores = pd.DataFrame(f_score)
+    f_scores = f_scores.append([avg_fscore])
+    f_scores.to_csv("dl_fscores.csv", index=False, header=False)
+    conf_matrix_df = pd.DataFrame(confusion_matrix)
+    conf_matrix_df.to_csv("dl_cmatriz.csv", index=False, header=False)
+    f_score = np.array(f_score)
+
+    return(confusion_matrix, f_score) 
+
     
 #Confusion matrix
 def confusion_matrix(z,y):
