@@ -33,7 +33,6 @@ def snn_train(x,y,param):
 
 # Load data from xData.csv, yData,csv
 def load_data_trn(trainingPerc):
-    
     xdata = pd.read_csv("xData.csv",header=None)
     xe = np.array(xdata)
     
@@ -46,7 +45,7 @@ def load_data_trn(trainingPerc):
     
     np.random.shuffle(data) #reordena la data aleatoriamente
     
-    data_division = int(len(data)*trainingPerc) #para dejar 70% train 30% test
+    data_division = int(len(data)*trainingPerc) 
     
     dtrain = data[0:data_division]
     dtest = data[data_division:]

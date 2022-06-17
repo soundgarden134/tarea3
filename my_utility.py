@@ -144,9 +144,9 @@ def metricas(x,y):
     avg_fscore = np.array(f_score).mean()
     f_scores = pd.DataFrame(f_score)
     f_scores = f_scores.append([avg_fscore])
-    f_scores.to_csv("dl_fscores.csv", index=False, header=False)
+    f_scores.to_csv("fscores.csv", index=False, header=False)
     conf_matrix_df = pd.DataFrame(confusion_matrix)
-    conf_matrix_df.to_csv("dl_cmatriz.csv", index=False, header=False)
+    conf_matrix_df.to_csv("cmatriz.csv", index=False, header=False)
     f_score = np.array(f_score)
 
     return(confusion_matrix, f_score) 
