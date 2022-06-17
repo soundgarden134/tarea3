@@ -148,13 +148,30 @@ def binary_label(): #uso get dummies
   return
 
 # Data norm 
-def data_norm():
-  ...
-  return 
+def data_norm(x):
+
+    a = 0.1
+    b = 0.99
+    num_cols = x.shape[1]
+    x_normalized = np.zeros(x.shape)
+    for i in range(x.shape[1]):
+        nmax = np.max(x[:,i])
+        nmin = np.min(x[:,i])
+        for j in range(x.shape[0]):
+            x_normalized[j,i] = (x[j,i] - nmin) / (nmax - nmin)
+            x_normalized[j,i] = (b-a)*x_normalized[j,i] + a
+        
+
+    return x_normalized
+        
+
 
 # Save Data from  Hankel's features
-def save_data_features(Dinp, Dout):
-    ...  
+def save_data_features(x_norm, labels):
+    np.savetxt('xData.csv', x_norm, delimiter=',') 
+    labels = labels.astype(int)
+    np.savetxt('yData.csv', labels, delimiter = ',')
+    
     return
 
 # Load data from Data.csv
@@ -186,8 +203,8 @@ def main():
     xe, ye      = load_data("Data_1.csv")	
     print("Datos cargados")
     Dinput,Dout = hankel_features(xe,ye, par_prep)
-    # Dinput      = data_norm(Dinput)
-    # save_data_features(Dinput,Dout)
+    x_normalized     = data_norm(Dinput)
+    save_data_features(x_normalized,Dout)
 
 
 if __name__ == '__main__':   
