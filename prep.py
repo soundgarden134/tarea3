@@ -54,7 +54,6 @@ def get_features(x, par_prep, label):
         new_features = np.append(new_features, new_x)
 
 
-    end = timer()
     new_features = np.split(new_features, numSegments)
     for i in range(len(segments)):
         new_labels = np.append(new_labels,label)
@@ -150,7 +149,7 @@ def binary_label(): #uso get dummies
 # Data norm 
 def data_norm(x):
 
-    a = 0.1
+    a = 0.01
     b = 0.99
     num_cols = x.shape[1]
     x_normalized = np.zeros(x.shape)
@@ -176,12 +175,15 @@ def save_data_features(x_norm, labels):
 
 # Load data from Data.csv
 def load_data(fname):
+    start = timer()
     data = pd.read_csv(fname,header=None)
     xe = data.iloc[:,:-1]
     xe = np.array(xe)
     ye = data.iloc[:, -1]
     ye = pd.get_dummies(ye) #one hot encoder
     ye = np.array(ye)
+    end = timer()
+    print("Tiempo en carga de datos: " + str(round(end-start)) + " seconds.")
 
 
     return(xe,ye)
@@ -200,7 +202,7 @@ def load_cnf_prep():
 def main():        
     par_prep    = load_cnf_prep()	
     print("Cargando datos")
-    xe, ye      = load_data("Data_1.csv")	
+    xe, ye      = load_data("Data_2.csv")	
     print("Datos cargados")
     Dinput,Dout = hankel_features(xe,ye, par_prep)
     x_normalized     = data_norm(Dinput)

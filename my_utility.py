@@ -72,7 +72,7 @@ def gradW(a,w,y):
     delta = [None]*len(w)
     
     e = a[-1].T - y
-    cost =  ((a[-1].T - y)**2).mean(axis=None)
+    cost =  ((a[-1].T - y)**2).mean(axis=None) #MSE
     
     delta[-1] = e * deriva_sigmoid(a[-1].T)
     gW[-1] = delta[-1].T @ a[-2].T
